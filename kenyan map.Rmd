@@ -1,0 +1,96 @@
+---
+title: "Kenyan Boundaries"
+author: "Joskevin Otieno"
+date: '2022-03-24'
+output: pdf_document
+---
+
+
+```{r}
+#Load Packages
+
+library(sf)#for vector data
+library(rgdal)#allows to read shape file
+library(broom)#'fortify' the data to get a dataframe format required by ggplot2
+library(ggplot2)
+library(tidyverse)
+```
+
+
+```{r}
+#import data shapefile
+Counties <- st_read("C:/Users/User/Desktop/R/boundaries/County.shp")
+summary(Counties)
+Counties
+```
+
+```{r}
+#view the geometry type of our counties file
+st_geometry_type(Counties)
+st_crs(Counties)
+st_bbox(Counties)
+```
+
+
+```{r}
+#plot it
+ggplot() + geom_sf(data = Counties,size=1 ,color= "black",fill= "orange") + ggtitle("KENYA") + coord_sf()
+```
+
+
+
+```{r}
+#import province dataset containing voters registration population data with their provinces
+library(readxl)
+province <- read_excel("C:/Users/User/Desktop/R/kenya/province.xlsx")
+View(province)
+```
+
+
+```{r}
+#combining two datasets merge
+#r merge by rownames
+combine <- merge(Counties,province,by = 'COUNTY')
+View(combine)
+```
+
+
+
+
+```{r}
+#displaying map showing provinces
+ggplot(data = combine) + geom_sf(aes(fill = PROVINCE), color = "black", size = 0.05)
+
+```
+
+
+```{r}
+#displaying one province and a county map examp
+Rift_Valley <- subset(combine,PROVINCE %in% "Rift Valley")
+# Rift valley provice plot
+ggplot(data = Rift_Valley) + geom_sf(aes(fill = VOTERS), color = "black", size = 0.05)
+#Display of a certain county example Turkana
+Turkana <- subset(combine,COUNTY %in% "Turkana")
+ggplot(data = Turkana) + geom_sf(aes(fill = VOTERS), color = "black", size = 0.05)
+#Display of two counties example Turkana and West Pokot
+Turkana_Westpokot <-subset(combine,COUNTY %in% c( "West Pokot","Turkana"))
+ggplot(data = Turkana_Westpokot) + geom_sf(aes(fill = COUNTY), color = "black", size = 0.05)
+```
+
+
+
+```{r}
+#displaying two or more province
+
+#merge of two provinces
+Rift_Valley_Eastern <- subset(combine,PROVINCE %in% c("Rift Valley","Eastern"))
+#plot
+ggplot(data = Rift_Valley_Eastern) + geom_sf(aes(fill = PROVINCE), color = "black", size = 0.05)
+```
+
+
+
+
+
+
+
